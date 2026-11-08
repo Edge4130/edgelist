@@ -1,0 +1,66 @@
+// WingList topic. Same content and functionality as the original WingList app.
+export default {
+  slug: "wings",
+  name: "WingList",
+  tagline: "Rate wings. Settle debates.",
+  itemNoun: "scorecard",
+  favicon: "🍗",
+  theme: {
+    fontsHref: "https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=JetBrains+Mono:wght@400;700;800&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=Space+Grotesk:wght@700&display=swap",
+    fonts: {
+      display: '"Oswald", "Arial Narrow", sans-serif',
+      body: '"Source Serif 4", Georgia, serif',
+      mono: '"JetBrains Mono", ui-monospace, Consolas, monospace',
+    },
+    light: {
+      bg: "#2E4257", bgInk: "#F7F3EA", bgMuted: "#C9BB9C",
+      card: "#F7F3EA", ink: "#14181C", muted: "#8B8574", line: "rgba(20,24,28,0.15)", field: "#FFFFFF",
+      headerAccent: "#C9BB9C", header: "#2E4257", headerInk: "#F7F3EA", headerMuted: "#C9BB9C", headerLine: "rgba(247,243,234,0.3)",
+      accent: "#6E1E22", accentInk: "#F7F3EA", accentSoft: "rgba(110,30,34,0.1)",
+      title: "#14181C", link: "#6E1E22", danger: "#6E1E22", dangerSoft: "rgba(110,30,34,0.1)", good: "#2F7A3D",
+    },
+    dark: null,
+    logo: `<svg viewBox="0 0 100 118" aria-hidden="true"><defs><clipPath id="wlShieldClip"><path d="M 50 4 L 90 16 L 90 58 C 90 88 72 104 50 114 C 28 104 10 88 10 58 L 10 16 Z"/></clipPath></defs><g clip-path="url(#wlShieldClip)"><rect x="0" y="0" width="100" height="118" fill="#2E4257"/><rect x="-30" y="54" width="170" height="28" fill="#6E1E22" transform="rotate(-24 50 66)"/></g><path d="M 50 4 L 90 16 L 90 58 C 90 88 72 104 50 114 C 28 104 10 88 10 58 L 10 16 Z" fill="none" stroke="#EDE6D6" stroke-width="3"/><text x="50" y="58" text-anchor="middle" dominant-baseline="middle" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="42" fill="#F7F3EA" letter-spacing="-1">WL</text></svg>`,
+    totalStyle: "stamp",
+  },
+  form: [
+    { type: "text", bind: "item_name", label: "Restaurant", placeholder: "e.g. Al's Wing Shack", required: true },
+    { type: "text", bind: "reviewer", label: "Reviewer", placeholder: "Your name", required: true, half: true },
+    { type: "date", bind: "entry_date", label: "Date", half: true },
+    { type: "photo", bind: "photo", label: "Photo" },
+    { type: "location", label: "Location", placeholder: "Restaurant or address" },
+    {
+      type: "sliders", bind: "answers.scores", min: 1, max: 10, default: 5,
+      rows: [
+        { key: "appearance", label: "Appearance", hint: "Visual appeal, color, sauce coverage, evenness of cook." },
+        { key: "crispness", label: "Crispness", hint: "Exterior texture and crunch. Skin should remain crisp." },
+        { key: "meat", label: "Meat Quality", hint: "Juiciness, tenderness, proper cook, meat-to-bone ratio." },
+        { key: "sauce", label: "Sauce", hint: "Flavor, balance, consistency, and how well it coats the wing." },
+        { key: "flavor", label: "Flavor", hint: "Overall taste, balance, and depth of flavor." },
+        { key: "execution", label: "Execution", hint: "Overall craftsmanship. Would you order these again?" },
+      ],
+    },
+    { type: "stamp" },
+    { type: "heat", bind: "answers.heat", label: "Heat", levels: ["Mild", "Medium", "Hot", "Very Hot"], default: "Medium" },
+    { type: "pills", bind: "style", label: "Style", options: ["Traditional Buffalo", "BBQ", "Dry Rub", "Asian", "Other"], default: "Traditional Buffalo", other: { option: "Other", bind: "answers.style_other", placeholder: "Describe the style" } },
+    { type: "textarea", bind: "comments", label: "Comments", placeholder: "Notes on the wings..." },
+    { type: "yesno", bind: "answers.order_again", label: "Would you order these again?" },
+  ],
+  bands: [
+    { min: 48, label: "Excellent", color: "#2F7A3D" },
+    { min: 36, label: "Solid", color: "#E8A33D" },
+    { min: 24, label: "Middling", color: "#6E1E22" },
+    { min: 0, label: "Rough", color: "#6E1E22" },
+  ],
+  list: {
+    defaultSort: "top",
+    lines: [["place"], ["reviewer", "date"]],
+    badges: [{ bind: "answers.heat", tone: "accent" }, { bind: "style", tone: "plain" }, { bind: "answers.order_again", kind: "yesno", label: "Again" }],
+    commentsIn: "card",
+    photoInDetail: false,
+    detailExtras: [],
+  },
+  about: [
+    { heading: null, text: "Rate wings. Settle debates. A shared leaderboard for wing scorecards." },
+  ],
+};
