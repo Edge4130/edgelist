@@ -30,3 +30,4 @@ Without a `.env` the app runs in preview mode using browser storage.
 
 BeerList style information is Copyright 2021, Beer Judge Certification Program, Inc., used with
 permission; scoresheet format Copyright 2019, BJCP.
+
