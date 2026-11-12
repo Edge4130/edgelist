@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from "react";
-import { topic } from "./topics";
 import { listEntries, saveEntry, deleteEntry, storageMode } from "./lib/store";
 import { useOwner, signOut } from "./lib/auth";
 import ScoreForm from "./components/ScoreForm";
@@ -11,7 +10,7 @@ import { contactHref } from "./config";
 
 const TABS = [["score", "Score"], ["log", "Log"], ["map", "Map"]];
 
-export default function App() {
+export default function App({ topic }) {
   const [tab, setTab] = useState("score");
   const [entries, setEntries] = useState([]);
   const [loadErr, setLoadErr] = useState("");
@@ -24,7 +23,7 @@ export default function App() {
   const refresh = useCallback(async () => {
     try { setEntries(await listEntries(topic.slug)); setLoadErr(""); }
     catch { setLoadErr("Couldn't load the log. Check the connection, then reload."); }
-  }, []);
+  }, [topic.slug]);
   useEffect(() => { refresh(); }, [refresh]);
   useEffect(() => { if (!toast) return; const t = setTimeout(() => setToast(""), 2600); return () => clearTimeout(t); }, [toast]);
 

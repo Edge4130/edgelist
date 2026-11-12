@@ -10,10 +10,21 @@ the engine renders its Score form, Log, Map and About from that config.
   sliders, stamp, BJCP style picker, judging scoresheet with flaws drawer
 - `src/components/` the shared screens: ScoreForm, LogView, MapView, About, SignIn
 - `src/lib/` data (store.js), owner login (auth.js), scoring, theming
-- `supabase/` database setup, owner setup, and the data copy from the old apps
+- `src/admin/` the Topic Builder
+- `supabase/` database setup, owner setup, the data copy, and the topics tables
 
 Each Vercel project sets `VITE_TOPIC` (`wings` or `beer`) to choose its topic.
 All topics share one GitHub repo and one Supabase project.
+
+## Topic Builder
+
+Open `/admin` on any EdgeList site (for example winglistapp.com/admin) and sign in as the owner.
+Topics live in the `topics` table: you edit a draft, check it in the phone preview, then Publish.
+Every publish is saved as a version you can load back into the draft. The apps read the published
+version at startup and fall back to the bundled copies in `src/topics/` if the database is unreachable.
+
+A new topic is created in the builder, published, then put online with one Vercel project from this
+repo with `VITE_TOPIC` set to the topic's key.
 
 ## Security
 
@@ -30,4 +41,3 @@ Without a `.env` the app runs in preview mode using browser storage.
 
 BeerList style information is Copyright 2021, Beer Judge Certification Program, Inc., used with
 permission; scoresheet format Copyright 2019, BJCP.
-

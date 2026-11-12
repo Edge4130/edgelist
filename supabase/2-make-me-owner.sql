@@ -3,7 +3,7 @@
 -- (check "Auto Confirm User"). Then put that same email below and run this.
 
 insert into public.edgelist_admins (user_id)
-select id from auth.users where email = 'daniel.edgerton@gmail.com'
+select id from auth.users where email = 'YOUR-EMAIL-HERE'
 on conflict do nothing;
 
 -- Should return exactly one row with your email:
