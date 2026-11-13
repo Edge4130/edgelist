@@ -48,7 +48,7 @@ export default function App({ topic }) {
         <div className="brand">
           <span className="mark" dangerouslySetInnerHTML={{ __html: topic.theme.logo }} />
           <span className="brand-text">
-            <span className="brand-name">{topic.name}</span>
+            <span className="brand-name">{topic.name}{topic.beta && <span className="beta-chip">Beta</span>}</span>
             <span className="brand-tag">{topic.tagline}</span>
           </span>
         </div>

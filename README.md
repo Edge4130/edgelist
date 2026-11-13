@@ -1,6 +1,6 @@
 # EdgeList
 
-One rating engine, many topics. Each topic (WingList, BeerList, next whiskey) is a config file;
+One rating engine, many topics. Each topic (WingList, BeerList, WhiskeyList) is a config file;
 the engine renders its Score form, Log, Map and About from that config.
 
 ## How it fits together
@@ -13,7 +13,7 @@ the engine renders its Score form, Log, Map and About from that config.
 - `src/admin/` the Topic Builder
 - `supabase/` database setup, owner setup, the data copy, and the topics tables
 
-Each Vercel project sets `VITE_TOPIC` (`wings` or `beer`) to choose its topic.
+Each Vercel project sets `VITE_TOPIC` (`wings`, `beer` or `whiskey`) to choose its topic.
 All topics share one GitHub repo and one Supabase project.
 
 ## Topic Builder
@@ -36,6 +36,13 @@ Sign in from About, then Owner sign in.
 
 `npm install`, copy `.env.example` to `.env`, fill it in, `npm run dev`.
 Without a `.env` the app runs in preview mode using browser storage.
+
+## WhiskeyList data
+
+`src/data/whiskeyStyles.js` holds the families, styles and Scotch regions. Each style's rules cite their
+public source (US 27 CFR 5.143 and 5.88, Tennessee Code 57-2-106, Scotch Whisky Regulations 2009, Irish
+Whiskey Technical File, Canada's Food and Drug Regulations, JSLMA standards). Flavor notes are general.
+`supabase/8-custom-tags.sql` lists the descriptor tags people use, to spot gaps in the suggestion lists.
 
 ## Credits
 

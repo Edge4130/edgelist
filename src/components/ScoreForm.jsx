@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 import { getAt, setAt } from "../lib/bind";
 import { blankEntry, totalOf, maxOf, bandFor, validate } from "../lib/scoring";
 import { STYLES } from "../data/bjcpStyles";
-import { TextBlock, DateBlock, TextAreaBlock, PhotoBlock, LocationBlock, PillsBlock, HeatBlock, YesNoBlock, SlidersBlock, Stamp } from "../blocks/basic";
+import { TextBlock, DateBlock, TextAreaBlock, PhotoBlock, LocationBlock, PillsBlock, HeatBlock, YesNoBlock, SlidersBlock, Stamp, NumberBlock, AgeBlock, MultiPillsBlock } from "../blocks/basic";
+import WhiskeyPicker from "../blocks/WhiskeyPicker";
+import { styleById } from "../data/whiskeyStyles";
+import { contactHref } from "../config";
 import StylePicker from "../blocks/StylePicker";
 import Sheet from "../blocks/Sheet";
 import FlawsDrawer from "../blocks/FlawsDrawer";
@@ -30,6 +33,10 @@ export default function ScoreForm({ topic, initial, onSave, onCancel }) {
   const styleBlock = topic.form.find((b) => b.type === "stylePicker");
   const st = styleBlock ? STYLES.find((s) => s.n === getAt(e, styleBlock.numberBind))?.st : null;
   const srmRange = st?.srmmin != null ? [st.srmmin, st.srmmax] : null;
+  const picker = topic.form.find((b) => b.type === "whiskeyPicker");
+  const family = picker ? getAt(e, picker.familyBind) : null;
+  const pickedStyle = picker ? styleById(getAt(e, picker.styleBind)) : null;
+  const colorNote = pickedStyle ? (pickedStyle.coloring ? "Caramel coloring is allowed in this style, so color isn't a reliable sign of age." : "No coloring allowed in this style: the color is all barrel.") : null;
   const anyScored = sheet ? sheet.sections.some((s) => getAt(e, sheet.bind)?.[s.key]?.score != null) : true;
 
   async function save() {
@@ -76,7 +83,7 @@ export default function ScoreForm({ topic, initial, onSave, onCancel }) {
       continue;
     }
     if (b.type === "sheet") {
-      out.push(<Sheet key={i} b={b} value={getAt(e, b.bind)} srmRange={b.srmFromStyle ? srmRange : null} onChange={(v) => set(b.bind, v)} />);
+      out.push(<Sheet key={i} b={b} value={getAt(e, b.bind)} srmRange={b.srmFromStyle ? srmRange : null} family={family} colorNote={colorNote} onChange={(v) => set(b.bind, v)} />);
       continue;
     }
     if (b.type === "stamp") {
@@ -99,6 +106,28 @@ export default function ScoreForm({ topic, initial, onSave, onCancel }) {
       case "heat": return <HeatBlock b={b} value={v} onChange={(x) => set(b.bind, x)} />;
       case "yesno": return <YesNoBlock b={b} value={v} onChange={(x) => set(b.bind, x)} />;
       case "sliders": return <SlidersBlock b={b} value={v} onChange={(x) => set(b.bind, x)} />;
+      case "number": return <NumberBlock b={b} value={v} onChange={(x) => set(b.bind, x)} />;
+      case "age": return (
+        <AgeBlock b={b} years={v} nas={getAt(e, "answers.nas")}
+          onChange={({ years, nas, label }) => setE((cur) => setAt(setAt(setAt(cur, b.bind, years), "answers.nas", nas), "answers.age_label", label))} />
+      );
+      case "multipills": return (
+        <MultiPillsBlock b={b} value={v} detailValue={b.detail ? getAt(e, b.detail.bind) : undefined}
+          onChange={(x) => set(b.bind, x)} onDetail={(x) => set(b.detail.bind, x)} />
+      );
+      case "whiskeyPicker": return (
+        <WhiskeyPicker b={b} family={getAt(e, b.familyBind)} styleId={getAt(e, b.styleBind)} region={getAt(e, b.regionBind)} country={getAt(e, b.countryBind)}
+          correctionHref={topic.correctionLink ? contactHref(topic).replace(/subject=[^&]*/, "subject=" + encodeURIComponent(`${topic.name} correction: `)) : null}
+          onChange={({ family: f, styleId, region, country }) => setE((cur) => {
+            let next = setAt(cur, b.familyBind, f || null);
+            next = setAt(next, b.styleBind, styleId || null);
+            next = setAt(next, b.regionBind, region || null);
+            next = setAt(next, b.countryBind, country || null);
+            const st = styleById(styleId);
+            const name = st ? (st.country && country ? `${st.name} (${country})` : st.name) : null;
+            return setAt(next, b.bind, name);
+          })} />
+      );
       case "stylePicker": return (
         <div>
           <div className="lbl">{b.label}</div>

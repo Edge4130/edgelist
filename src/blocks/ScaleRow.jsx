@@ -4,13 +4,13 @@ import TagBox from "./TagBox";
 
 // One scoresheet characteristic: label (tap for the criteria), a segmented scale, an off-style flag,
 // and optional descriptor tags.
-export default function ScaleRow({ row, value, off, tags, srmRange, descriptors = {}, onChange, onToggleOff, onTags }) {
+export default function ScaleRow({ row, value, off, tags, srmRange, descriptors = {}, spotlight, note, onChange, onToggleOff, onTags }) {
   const [open, setOpen] = useState(false);
   const ends = row.ends;
   const inRange = (i) => srmRange && row.srm && row.srm[i] >= srmRange[0] - 1 && row.srm[i] <= srmRange[1] + 1;
 
   return (
-    <div className={"row" + (row.wide ? " row-wide" : "")}>
+    <div className={"row" + (row.wide ? " row-wide" : "") + (spotlight ? " row-spot" : "")}>
       <div className="row-main">
         <button type="button" className="row-label" title={tipText(row.tip)} aria-expanded={open} onClick={() => setOpen(!open)}>
           {row.label}
@@ -44,7 +44,7 @@ export default function ScaleRow({ row, value, off, tags, srmRange, descriptors 
       </div>
       {row.swatch && (
         <div className="ends-labels">
-          <span>{value != null ? `${row.scale[value]}, SRM ~${row.srm[value]}` : srmRange ? "Dots mark this style's color range" : ""}</span>
+          <span>{value != null ? (row.srm ? `${row.scale[value]}, SRM ~${row.srm[value]}` : row.scale[value]) : srmRange ? "Dots mark this style's color range" : ""}</span>
         </div>
       )}
       {ends && (
@@ -52,6 +52,7 @@ export default function ScaleRow({ row, value, off, tags, srmRange, descriptors 
           <span>{row.scale[0]}</span><span>{row.scale[row.scale.length - 1]}</span>
         </div>
       )}
+      {note && <p className="small muted row-note">{note}</p>}
       {open && (
         <Tip tip={row.tip}>
           <p className="tip-off">✕ marks it inappropriate for the style.</p>

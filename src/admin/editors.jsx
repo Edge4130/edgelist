@@ -58,7 +58,7 @@ export function BrandTab({ t, set }) {
   );
 }
 
-const TYPE_LABELS = { text: "Text", date: "Date", photo: "Photo", location: "Location", pills: "Choices", heat: "Heat gauge", yesno: "Yes / No", textarea: "Long text", stamp: "Score stamp", stylePicker: "Style picker", sliders: "Scoring", sheet: "Scoring" };
+const TYPE_LABELS = { number: "Number", age: "Age", multipills: "Multiple choices", whiskeyPicker: "Whiskey picker", text: "Text", date: "Date", photo: "Photo", location: "Location", pills: "Choices", heat: "Heat gauge", yesno: "Yes / No", textarea: "Long text", stamp: "Score stamp", stylePicker: "Style picker", sliders: "Scoring", sheet: "Scoring" };
 const COLUMNS = { text: [["maker", "Maker (brewery, distillery...)"], ["reviewer", "Reviewer name"]], textarea: [["comments", "Comments"]], pills: [["style", "Style"]] };
 
 function customKeys(form) {
@@ -128,7 +128,7 @@ function BlockEditor({ b, up, form, hasBesidePhoto }) {
       {["text", "textarea", "location"].includes(b.type) && <Field label="Placeholder" value={b.placeholder} onChange={(v) => up({ ...b, placeholder: v })} />}
       {b.bind === "item_name" ? <p className="af-help">This is the item's name. It's always required and can't be removed.</p>
         : b.type === "text" && <Toggle label="Required to save" value={b.required} onChange={(v) => up({ ...b, required: v || undefined })} />}
-      {["text", "date"].includes(b.type) && <Toggle label="Half width (pairs with the next half-width field)" value={b.half} onChange={(v) => up({ ...b, half: v || undefined })} />}
+      {["text", "date", "number", "age"].includes(b.type) && <Toggle label="Half width (pairs with the next half-width field)" value={b.half} onChange={(v) => up({ ...b, half: v || undefined })} />}
       {b.type === "text" && hasBesidePhoto && <Toggle label="Sit beside the photo" value={b.group === "photo"} onChange={(v) => up({ ...b, group: v ? "photo" : undefined })} />}
       {b.type === "photo" && <Select label="Layout" value={b.layout || "wide"} onChange={(v) => up({ ...b, layout: v === "wide" ? undefined : v })} options={[["wide", "Full width"], ["beside-next", "Small, with fields beside it"]]} />}
       {b.type === "pills" && (
@@ -148,6 +148,16 @@ function BlockEditor({ b, up, form, hasBesidePhoto }) {
         </>
       )}
       {b.type === "stylePicker" && <p className="af-help">Uses the {b.dataset === "bjcp2021" ? "BJCP 2021" : b.dataset} style list.</p>}
+      {b.type === "whiskeyPicker" && <p className="af-help">Uses the WhiskeyList style data (families, styles, Scotch regions). Edit that list in code for now.</p>}
+      {b.type === "pills" && <Area label="Hint under the choices (optional)" rows={2} value={b.hint} onChange={(v) => up({ ...b, hint: v || undefined })} />}
+      {b.type === "number" && (
+        <div className="row3">
+          <Field label="Lowest" type="number" value={b.min} onChange={(v) => up({ ...b, min: v })} />
+          <Field label="Highest" type="number" value={b.max} onChange={(v) => up({ ...b, max: v })} />
+          <Field label="Placeholder" value={b.placeholder} onChange={(v) => up({ ...b, placeholder: v })} />
+        </div>
+      )}
+      {b.type === "multipills" && <ListField label="Options" value={b.options} onChange={(v) => up({ ...b, options: v })} />}
       {b.bind !== "item_name" && <SavedAs b={b} form={form} onChange={up} />}
     </>
   );

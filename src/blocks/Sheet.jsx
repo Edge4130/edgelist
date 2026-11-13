@@ -3,15 +3,15 @@ import ScaleRow from "./ScaleRow";
 import Tip from "./Tip";
 
 // Judging scoresheet: sections with a point box, characteristic rows, optional descriptor tags.
-export default function Sheet({ b, value = {}, srmRange, onChange }) {
+export default function Sheet({ b, value = {}, srmRange, family, colorNote, onChange }) {
   const setSection = (key, patch) => onChange({ ...value, [key]: { ...(value[key] || { rows: {}, off: {}, tags: {} }), ...patch } });
   return b.sections.map((s) => (
     <SheetSection key={s.key} s={s} sec={value[s.key] || { score: null, rows: {}, off: {}, tags: {} }} srmRange={srmRange}
-      descriptors={b.descriptors} onChange={(patch) => setSection(s.key, patch)} />
+      descriptors={b.descriptors} family={family} colorNote={colorNote} onChange={(patch) => setSection(s.key, patch)} />
   ));
 }
 
-function SheetSection({ s, sec, srmRange, descriptors, onChange }) {
+function SheetSection({ s, sec, srmRange, descriptors, family, colorNote, onChange }) {
   const [open, setOpen] = useState(false);
   return (
     <section className="block sheet" id={`section-${s.key}`}>
@@ -23,6 +23,8 @@ function SheetSection({ s, sec, srmRange, descriptors, onChange }) {
       {s.rows.map((r) => (
         <ScaleRow key={r.key} row={r} value={sec.rows?.[r.key] ?? null} off={sec.off?.[r.key]} tags={sec.tags?.[r.key]}
           srmRange={r.key === "color" ? srmRange : null} descriptors={descriptors}
+          spotlight={!!(family && r.spotlight?.includes(family))}
+          note={r.key === "color" ? colorNote : family && r.spotlight?.includes(family) ? r.spotlightNote : null}
           onChange={(v) => { const rows = { ...(sec.rows || {}) }; if (v == null) delete rows[r.key]; else rows[r.key] = v; onChange({ rows }); }}
           onToggleOff={() => { const off = { ...(sec.off || {}) }; if (off[r.key]) delete off[r.key]; else off[r.key] = true; onChange({ off }); }}
           onTags={(list) => { const tags = { ...(sec.tags || {}) }; if (list.length) tags[r.key] = list; else delete tags[r.key]; onChange({ tags }); }} />

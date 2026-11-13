@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { compressImage } from "../lib/image";
 import { getPosition, reverseGeocode, searchPlace } from "../lib/geo";
 
@@ -131,6 +131,7 @@ export function PillsBlock({ b, value, otherValue, onChange, onOther }) {
             }}>{o}</button>
         ))}
       </div>
+      {b.hint && <p className="small muted field-note">{b.hint}</p>}
       {isOther && (
         <input className="field other-input" value={otherText} placeholder={b.other.placeholder} aria-label={b.other.placeholder}
           onChange={(e) => { onOther?.(e.target.value); onChange(e.target.value || b.other.option); }} />
@@ -202,6 +203,73 @@ export function Stamp({ total, max, band }) {
         <span className="stamp-max">/ {max}</span>
       </div>
       <span className="stamp-band" style={{ color: band.color }}>{band.label}</span>
+    </div>
+  );
+}
+
+// Decimal number, e.g. proof. showAbv adds the ABV equivalent (proof / 2).
+export function NumberBlock({ b, value, onChange }) {
+  const [text, setText] = useState(value == null ? "" : String(value));
+  // Follow outside changes (form reset after saving, loading an entry to edit).
+  useEffect(() => { if ((parseFloat(text) || null) !== (value ?? null)) setText(value == null ? "" : String(value)); }, [value]); // eslint-disable-line
+  return (
+    <label className="lbl">{b.label}
+      <input className="field mono" inputMode="decimal" value={text} placeholder={b.placeholder}
+        onChange={(e) => {
+          const t = e.target.value.replace(/[^0-9.]/g, "");
+          setText(t);
+          const n = parseFloat(t);
+          onChange(t === "" || isNaN(n) ? null : Math.min(b.max ?? Infinity, n));
+        }} />
+      {b.showAbv && value != null && <span className="small muted field-note">= {Math.round((value / 2) * 10) / 10}% ABV</span>}
+    </label>
+  );
+}
+
+// Age in years, or "No age statement". Also stores a readable label for the log.
+export function AgeBlock({ b, years, nas, onChange }) {
+  const [text, setText] = useState(years == null ? "" : String(years));
+  useEffect(() => { if ((text === "" ? null : Number(text)) !== (years ?? null)) setText(years == null ? "" : String(years)); }, [years]); // eslint-disable-line
+  const label = (y, n) => (n ? "No age statement" : y != null ? `${y} ${y === 1 ? "year" : "years"}` : null);
+  return (
+    <div>
+      <label className="lbl">{b.label}
+        <input className="field mono" inputMode="numeric" value={nas ? "" : text} disabled={nas} placeholder="Years"
+          onChange={(e) => {
+            const t = e.target.value.replace(/\D/g, "").slice(0, 3);
+            setText(t);
+            const y = t === "" ? null : Number(t);
+            onChange({ years: y, nas: false, label: label(y, false) });
+          }} />
+      </label>
+      <label className="check">
+        <input type="checkbox" checked={!!nas} onChange={(e) => onChange({ years: e.target.checked ? null : years, nas: e.target.checked, label: label(e.target.checked ? null : years, e.target.checked) })} />
+        No age statement
+      </label>
+    </div>
+  );
+}
+
+// Several choices at once. An optional detail box appears for one option.
+export function MultiPillsBlock({ b, value = [], detailValue, onChange, onDetail }) {
+  const list = Array.isArray(value) ? value : [];
+  const tips = b.tips ? list.filter((o) => b.tips[o]) : [];
+  return (
+    <div>
+      <div className="lbl">{b.label}</div>
+      <div className="pills" role="group" aria-label={b.label}>
+        {b.options.map((o) => {
+          const on = list.includes(o);
+          return (
+            <button key={o} type="button" aria-pressed={on} className={"pill" + (on ? " on" : "")}
+              onClick={() => onChange(on ? list.filter((x) => x !== o) : [...list, o])}>{o}</button>
+          );
+        })}
+      </div>
+      {b.detail && list.includes(b.detail.option) && (
+        <input className="field other-input" value={detailValue || ""} placeholder={b.detail.placeholder} aria-label={b.detail.placeholder} onChange={(e) => onDetail(e.target.value)} />
+      )}
+      {tips.map((o) => <p key={o} className="tip"><span className="tip-k">{o}:</span> {b.tips[o]}</p>)}
     </div>
   );
 }

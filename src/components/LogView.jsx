@@ -20,7 +20,8 @@ function token(p, t) {
     case "styleFull": {
       const n = p.answers?.style_number;
       const v = p.answers?.style_variant;
-      return p.style ? `${n ? n + " " : ""}${p.style}${v ? `, ${v}` : ""}` : "";
+      const r = p.answers?.region;
+      return p.style ? `${n ? n + " " : ""}${p.style}${v ? `, ${v}` : ""}${r ? `, ${r}` : ""}` : "";
     }
     default: return getAt(p, t);
   }
@@ -88,7 +89,7 @@ export default function LogView({ topic, entries, isOwner, onEdit, onDelete, onS
                     {topic.list.badges.map((bd, i) => {
                       const v = getAt(p, bd.bind);
                       if (bd.kind === "yesno") return v == null ? null : <span key={i} className={"badge " + (v ? "good" : "bad")}>{v ? "✓" : "✕"} {bd.label}</span>;
-                      return v ? <span key={i} className={"badge " + bd.tone}>{v}</span> : null;
+                      return v != null && v !== "" ? <span key={i} className={"badge " + bd.tone}>{v}{bd.suffix || ""}</span> : null;
                     })}
                   </span>
                 )}
@@ -117,7 +118,8 @@ function Detail({ topic, p, isOwner, onEdit, onDelete, onPhoto }) {
     <div className="detail">
       {topic.list.photoInDetail && p.photo && <button type="button" className="detail-photo" onClick={onPhoto}><img src={p.photo} alt="Photo" /></button>}
       {topic.list.detailExtras.map((x, i) => {
-        const v = getAt(p, x.bind);
+        const raw = getAt(p, x.bind);
+        const v = Array.isArray(raw) ? raw.join(", ") : raw;
         return v ? <p key={i} className="small muted">{x.label}: {v}</p> : null;
       })}
       {sb?.type === "sliders" && (
